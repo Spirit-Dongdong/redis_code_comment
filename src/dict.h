@@ -44,16 +44,22 @@
 /* Unused arguments generate annoying warnings... */
 #define DICT_NOTUSED(V) ((void) V)
 
+// 哈希表节点
+// 通过链表解决哈希冲突（separate chaining hash table）
 typedef struct dictEntry {
+    // 键
     void *key;
+    // 值
     union {
         void *val;
         uint64_t u64;
         int64_t s64;
     } v;
+    // 节点指针，形成链表
     struct dictEntry *next;
 } dictEntry;
 
+// 一集为不同类型值设置的字典操作函数
 typedef struct dictType {
     unsigned int (*hashFunction)(const void *key);
     void *(*keyDup)(void *privdata, const void *key);
@@ -65,18 +71,29 @@ typedef struct dictType {
 
 /* This is our hash table structure. Every dictionary has two of this as we
  * implement incremental rehashing, for the old to the new table. */
+// 哈希表结构
 typedef struct dictht {
+    // 一个数组，每个数组元素都是一个指向哈希表节点（链表）的指针
     dictEntry **table;
+    // 可容纳元素的大小
     unsigned long size;
+    // 掩码，用于计算哈希值
     unsigned long sizemask;
+    // 已有元素数量
     unsigned long used;
 } dictht;
 
+// 字典结构
 typedef struct dict {
+    // 值的操作函数
     dictType *type;
     void *privdata;
+    // 每个字典维持两个哈希表
+    // 用于渐增式 rehash
     dictht ht[2];
+    // rehash 的状态变量， -1 表示 rehash 未进行
     int rehashidx; /* rehashing not in progress if rehashidx == -1 */
+    // 当前正在处理这个字典的迭代器数量
     int iterators; /* number of iterators currently running */
 } dict;
 
@@ -84,13 +101,23 @@ typedef struct dict {
  * dictAdd, dictFind, and other functions against the dictionary even while
  * iterating. Otherwise it is a non safe iterator, and only dictNext()
  * should be called while iterating. */
+// 字典迭代器
+// 如果 safe 属性的值为 1
+// 表示在迭代过程中可以用 dictAdd 、 dictFind 等函数对字典进行处理
+// 否则，迭代器应该只使用 dictNext() 进行迭代操作
 typedef struct dictIterator {
+    // 正在迭代的字典
     dict *d;
+    // table 为哈希表索引
+    // index 为正在迭代的哈希表 table 数组的索引
     int table, index, safe;
+    // entry 表示当前节点
+    // nextEntry 表示下个节点
     dictEntry *entry, *nextEntry;
 } dictIterator;
 
 /* This is the initial size of every hash table */
+// 哈希表的起始大小
 #define DICT_HT_INITIAL_SIZE     4
 
 /* ------------------------------- Macros ------------------------------------*/
