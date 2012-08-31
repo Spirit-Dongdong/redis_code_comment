@@ -7,3 +7,7 @@
 * 双端链表数据结构（ ``adlist.h`` 和 ``adlist.c`` ）
 
 * 事件处理（ ``ae.h`` 和 ``ae.c`` ）
+
+* 字典数据结构（ ``dict.h`` 和 ``dict.c`` ）
+
+* Lua 脚本支持（ ``scripting.c`` ）
