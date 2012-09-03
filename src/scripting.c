@@ -174,6 +174,13 @@ int luaRedisGenericCommand(lua_State *lua, int raise_error) {
     redisClient *c = server.lua_client; 
     sds reply;
 
+    /* Require at least one argument */
+    if (argc == 0) {
+        luaPushError(lua,
+            "Please specify at least one argument for redis.call()");
+        return 1;
+    }
+
     /* Build the arguments vector */
     // 根据输入，创建客户端所需的参数
     argv = zmalloc(sizeof(robj*)*argc);
@@ -307,6 +314,7 @@ int luaRedisGenericCommand(lua_State *lua, int raise_error) {
     }
     // 释放回复字符串
     sdsfree(reply);
+    c->reply_bytes = 0;
 
 cleanup:
     /* Clean up. Command code may have changed argv/argc so we use the
